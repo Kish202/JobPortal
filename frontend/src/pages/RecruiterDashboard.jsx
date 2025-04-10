@@ -4,24 +4,23 @@ import { mockData } from '../data/mockdata';
 import {useEffect, useState} from 'react';
 import flowe from '../assets/flowe1.png'
 
-import { delay, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {useAuth}  from '../context/AuthContext';
 const RecruiterDashboard = () => {
   const navigate = useNavigate();
   const { stats, topCandidates } = mockData.recruiter;
- const [scrolled, setScrolled] = useState(false);
- const [jobPostings, setJobPostings] = useState(() => {
-  // Try to get jobs from localStorage first
-  const savedJobs = localStorage.getItem('jobPostings');
-  return savedJobs ? JSON.parse(savedJobs) : mockData.recruiter.jobPostings;
-});
-const {logout} = useAuth();
-// Save jobs to localStorage whenever they change
-useEffect(() => {
-  localStorage.setItem('jobPostings', JSON.stringify(jobPostings));
-}, [jobPostings]);
+  const [scrolled, setScrolled] = useState(false);
+  const [jobPostings, setJobPostings] = useState(() => {
+    // Try to get jobs from localStorage first
+    const savedJobs = localStorage.getItem('jobPostings');
+    return savedJobs ? JSON.parse(savedJobs) : mockData.recruiter.jobPostings;
+  });
+  const {logout} = useAuth();
   
+  // Form display state
   const [showNewJobForm, setShowNewJobForm] = useState(false);
+  
+  // State for new job creation
   const [newJob, setNewJob] = useState({
     title: '',
     department: '',
@@ -31,84 +30,85 @@ useEffect(() => {
     status: 'Active',
     daysOpen: 0
   });
-
-
   
+  // State for job editing
   const [editingJobId, setEditingJobId] = useState(null);
+  const [editedJob, setEditedJob] = useState({
+    title: '',
+    department: '',
+    location: '',
+    description: '',
+  });
+
+  useEffect(() => {
+    localStorage.setItem('jobPostings', JSON.stringify(jobPostings));
+  }, [jobPostings]);
   
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
-   useEffect(() => {
-      const handleScroll = () => {
-        const isScrolled = window.scrollY > 10;
-        if (isScrolled !== scrolled) {
-          setScrolled(isScrolled);
-        }
-      };
   
-      window.addEventListener('scroll', handleScroll);
-      return () => {
-        window.removeEventListener('scroll', handleScroll);
-      };
-    }, [scrolled]);
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
+    };
 
-      const containerVariants = {
-        hidden: {},
-        show: {
-          transition: {
-            staggerChildren: 0.1,
-            
-           
-          }
-        }
-      };
-    
-      
-      
-     
-      const boxVariants = {
-        hidden: { scale: 0, opacity: 0 },
-        show: { 
-          scale: 1, 
-          opacity: 1,
-          transition: { 
-            type: "spring",
-            stiffness: 260,
-            damping: 20,
-            delay: 0.3 * (Math.random() * 2) // Random delay for each skill
-          }
-        }
-      };
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [scrolled]);
 
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.1,
+      }
+    }
+  };
+  
+  const boxVariants = {
+    hidden: { scale: 0, opacity: 0 },
+    show: { 
+      scale: 1, 
+      opacity: 1,
+      transition: { 
+        type: "spring",
+        stiffness: 260,
+        damping: 20,
+        delay: 0.3 * (Math.random() * 2) // Random delay for each skill
+      }
+    }
+  };
 
-      const formVariants = {
-        hidden: { height: 0, opacity: 0 },
-        show: { 
-          height: 'auto', 
-          opacity: 1,
-          transition: { 
-            type: "spring",
-            stiffness: 200,
-            damping: 25
-          }
-        }
-      };
+  const formVariants = {
+    hidden: { height: 0, opacity: 0 },
+    show: { 
+      height: 'auto', 
+      opacity: 1,
+      transition: { 
+        type: "spring",
+        stiffness: 200,
+        damping: 25
+      }
+    }
+  };
 
-
-    
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (editingJobId !== null) {
-      setJobPostings(prevJobs => 
-        prevJobs.map(job => 
-          job.id === editingJobId 
-            ? { ...job, [name]: value } 
-            : job
-        )
-      );
+      // Update the edited job state separately from the actual job listings
+      setEditedJob(prev => ({
+        ...prev,
+        [name]: value
+      }));
     } else {
+      // Update new job state
       setNewJob(prev => ({
         ...prev,
         [name]: value
@@ -123,11 +123,19 @@ useEffect(() => {
       setJobPostings(prevJobs => 
         prevJobs.map(job => 
           job.id === editingJobId 
-            ? { ...job, editing: false } 
+            ? { 
+                ...job, 
+                title: editedJob.title,
+                department: editedJob.department,
+                location: editedJob.location,
+                description: editedJob.description,
+                editing: false 
+              } 
             : job
         )
       );
       setEditingJobId(null);
+      resetEditedJob();
     } else {
       // Create new job
       const newJobWithId = {
@@ -139,19 +147,30 @@ useEffect(() => {
       };
       
       setJobPostings(prevJobs => [...prevJobs, newJobWithId]);
-      
-      // Reset form and hide it
-      setNewJob({
-        title: '',
-        department: '',
-        location: '',
-        description: '',
-        applicants: 0,
-        status: 'Active',
-        daysOpen: 0
-      });
+      resetNewJob();
     }
     setShowNewJobForm(false);
+  };
+
+  const resetNewJob = () => {
+    setNewJob({
+      title: '',
+      department: '',
+      location: '',
+      description: '',
+      applicants: 0,
+      status: 'Active',
+      daysOpen: 0
+    });
+  };
+
+  const resetEditedJob = () => {
+    setEditedJob({
+      title: '',
+      department: '',
+      location: '',
+      description: '',
+    });
   };
 
   const handleEditJob = (job) => {
@@ -163,8 +182,8 @@ useEffect(() => {
     setEditingJobId(job.id);
     setShowNewJobForm(true);
     
-    // Populate form with job data
-    setNewJob({
+    // Populate edited job state with job data
+    setEditedJob({
       title: job.title,
       department: job.department || '',
       location: job.location || '',
@@ -178,76 +197,73 @@ useEffect(() => {
     alert(`Viewing details for: ${job.title}`);
   };
 
-  const cancelEdit = () => {
-    setEditingJobId(null);
+  const cancelNewJob = () => {
     setShowNewJobForm(false);
-    setNewJob({
-      title: '',
-      department: '',
-      location: '',
-      description: '',
-      applicants: 0,
-      status: 'Active',
-      daysOpen: 0
-    });
-    // Reset editing state for all jobs
+    resetNewJob();
+  };
+
+  const cancelEditJob = () => {
+    setEditingJobId(null);
     setJobPostings(prevJobs => 
       prevJobs.map(job => ({ ...job, editing: false }))
     );
+    resetEditedJob();
+    setShowNewJobForm(false);
   }; 
 
   return (
     <div className="bg-neugray-bg min-h-screen p-3 sm:p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-          <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-              scrolled ? 'bg-neugray-bg/70 backdrop-blur-sm shadow-md' : 'bg-neugray-bg'
-            }`}>
-              <div className="max-w-7xl mx-auto p-3 sm:p-4">
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-0">
-                  <div className="flex items-center gap-3">
-                    <img src={flowe} className='min-w-10 min-h-10 w-12 h-12 max-sm:pt-3 opacity-90' alt="Logo" />
-                    <h1 className="text-xl sm:text-2xl font-bold text-neugray-text">Recruiter Dashboard</h1>
-                  </div>
-                  <button 
-                    onClick={handleLogout}
-                    className="bg-neugray-bg px-4 py-2 rounded-lg shadow-neumorph-sm text-neugray-text font-medium hover:shadow-neumorph active:shadow-neumorph-pressed transition-shadow w-full sm:w-auto mt-3 sm:mt-0"
-                  >
-                    Logout
-                  </button>
-                </div>
+        <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled ? 'bg-neugray-bg/70 backdrop-blur-sm shadow-md' : 'bg-neugray-bg'
+        }`}>
+          <div className="max-w-7xl mx-auto p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-0">
+              <div className="flex items-center gap-3">
+                <img src={flowe} className='min-w-10 min-h-10 w-12 h-12 max-sm:pt-3 opacity-90' alt="Logo" />
+                <h1 className="text-xl sm:text-2xl font-bold text-neugray-text">Recruiter Dashboard</h1>
               </div>
+              <button 
+                onClick={handleLogout}
+                className="bg-neugray-bg px-4 py-2 rounded-lg shadow-neumorph-sm text-neugray-text font-medium hover:shadow-neumorph active:shadow-neumorph-pressed transition-shadow w-full sm:w-auto mt-3 sm:mt-0"
+              >
+                Logout
+              </button>
             </div>
+          </div>
+        </div>
 
         {/* Stats Cards */}
         <motion.div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-4 md:mb-6 mt-20"
          variants={containerVariants}
          initial="hidden"
-              animate="show">
+         animate="show">
           <motion.div className="bg-neugray-bg rounded-2xl shadow-neumorph p-4 sm:p-6 text-center"
            variants={boxVariants}
            initial="hidden"
-                animate="show">
+           animate="show">
             <h3 className="text-sm sm:text-base text-gray-600">Open Positions</h3>
             <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-neugray-accent mt-1 sm:mt-2">{stats.openPositions}</p>
           </motion.div>
           <motion.div className="bg-neugray-bg rounded-2xl shadow-neumorph p-4 sm:p-6 text-center"
            variants={boxVariants}
            initial="hidden"
-                animate="show">
+           animate="show">
             <h3 className="text-sm sm:text-base text-gray-600">Applicants Today</h3>
             <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-neugray-accent mt-1 sm:mt-2">{stats.applicantsToday}</p>
           </motion.div>
           <motion.div className="bg-neugray-bg rounded-2xl shadow-neumorph p-4 sm:p-6 text-center" 
-               variants={boxVariants}
-              initial="hidden"
-                   animate="show">
+            variants={boxVariants}
+            initial="hidden"
+            animate="show">
             <h3 className="text-sm sm:text-base text-gray-600">Interviews Scheduled</h3>
             <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-neugray-accent mt-1 sm:mt-2">{stats.interviewsScheduled}</p>
           </motion.div>
-          <motion.div className="bg-neugray-bg rounded-2xl shadow-neumorph p-4 sm:p-6 text-center" variants={boxVariants}
-              initial="hidden"
-                   animate="show">
+          <motion.div className="bg-neugray-bg rounded-2xl shadow-neumorph p-4 sm:p-6 text-center" 
+            variants={boxVariants}
+            initial="hidden"
+            animate="show">
             <h3 className="text-sm sm:text-base text-gray-600">Hiring Rate</h3>
             <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-neugray-accent mt-1 sm:mt-2">{stats.hiringRate}%</p>
           </motion.div>
@@ -257,12 +273,30 @@ useEffect(() => {
         <div className="bg-neugray-bg rounded-2xl shadow-neumorph p-4 sm:p-6 mb-4 md:mb-6">
           <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center mb-4 gap-2 xs:gap-0">
             <h2 className="text-lg sm:text-xl font-bold text-neugray-text">Job Postings</h2>
-            <button 
-              onClick={() => editingJobId ? cancelEdit() : setShowNewJobForm(!showNewJobForm)}
-              className="w-full xs:w-auto bg-neugray-bg px-3 py-1 rounded-lg shadow-neumorph-sm hover:shadow-neumorph active:shadow-neumorph-pressed transition-shadow text-neugray-accent font-medium"
-            >
-              {editingJobId ? '- Cancel Edit' : showNewJobForm ? '- Cancel' : '+ New Job'}
-            </button>
+            {!showNewJobForm && (
+              <button 
+                onClick={() => setShowNewJobForm(true)}
+                className="w-full xs:w-auto bg-neugray-bg px-3 py-1 rounded-lg shadow-neumorph-sm hover:shadow-neumorph active:shadow-neumorph-pressed transition-shadow text-neugray-accent font-medium"
+              >
+                + New Job
+              </button>
+            )}
+            {showNewJobForm && !editingJobId && (
+              <button 
+                onClick={cancelNewJob}
+                className="w-full xs:w-auto bg-neugray-bg px-3 py-1 rounded-lg shadow-neumorph-sm hover:shadow-neumorph active:shadow-neumorph-pressed transition-shadow text-red-500 font-medium"
+              >
+                - Cancel New Job
+              </button>
+            )}
+            {showNewJobForm && editingJobId && (
+              <button 
+                onClick={cancelEditJob}
+                className="w-full xs:w-auto bg-neugray-bg px-3 py-1 rounded-lg shadow-neumorph-sm hover:shadow-neumorph active:shadow-neumorph-pressed transition-shadow text-orange-500 font-medium"
+              >
+                - Cancel Edit
+              </button>
+            )}
           </div>
           
           {/* Jobs form */}
@@ -280,9 +314,7 @@ useEffect(() => {
                     type="text"
                     id="title"
                     name="title"
-                    value={editingJobId !== null 
-                      ? jobPostings.find(job => job.id === editingJobId)?.title || '' 
-                      : newJob.title}
+                    value={editingJobId !== null ? editedJob.title : newJob.title}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 bg-neugray-bg rounded-lg shadow-neumorph-inset focus:outline-none focus:ring-2 focus:ring-neugray-accent text-sm"
                     required
@@ -294,9 +326,7 @@ useEffect(() => {
                     type="text"
                     id="department"
                     name="department"
-                    value={editingJobId !== null 
-                      ? jobPostings.find(job => job.id === editingJobId)?.department || '' 
-                      : newJob.department}
+                    value={editingJobId !== null ? editedJob.department : newJob.department}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 bg-neugray-bg rounded-lg shadow-neumorph-inset focus:outline-none focus:ring-2 focus:ring-neugray-accent text-sm"
                     required
@@ -309,9 +339,7 @@ useEffect(() => {
                   type="text"
                   id="location"
                   name="location"
-                  value={editingJobId !== null 
-                    ? jobPostings.find(job => job.id === editingJobId)?.location || '' 
-                    : newJob.location}
+                  value={editingJobId !== null ? editedJob.location : newJob.location}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 bg-neugray-bg rounded-lg shadow-neumorph-inset focus:outline-none focus:ring-2 focus:ring-neugray-accent text-sm"
                   required
@@ -323,9 +351,7 @@ useEffect(() => {
                   id="description"
                   name="description"
                   rows="3"
-                  value={editingJobId !== null 
-                    ? jobPostings.find(job => job.id === editingJobId)?.description || '' 
-                    : newJob.description}
+                  value={editingJobId !== null ? editedJob.description : newJob.description}
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 bg-neugray-bg rounded-lg shadow-neumorph-inset focus:outline-none focus:ring-2 focus:ring-neugray-accent text-sm"
                   required
@@ -391,8 +417,7 @@ useEffect(() => {
             </table>
           </div>
         </div>
-       {/* jobs form */}
-      
+       
         {/* Top Candidates */}
         <div className="bg-neugray-bg rounded-2xl shadow-neumorph p-4 sm:p-6">
           <h2 className="text-lg sm:text-xl font-bold text-neugray-text mb-3 sm:mb-4">Top Candidates</h2>
