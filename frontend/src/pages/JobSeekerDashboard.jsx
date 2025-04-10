@@ -1,132 +1,3 @@
-// import React from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { mockData } from '../data/mockdata';
-
-// const JobSeekerDashboard = () => {
-//   const navigate = useNavigate();
-//   const { profile, appliedJobs, recommendedJobs, skills } = mockData.jobseeker;
-
-//   const handleLogout = () => {
-//     navigate('/login');
-//   };
-
-//   return (
-//     <div className="bg-neugray-bg min-h-screen p-6">
-//       <div className="max-w-7xl mx-auto">
-//         {/* Header */}
-//         <div className="flex justify-between items-center mb-8">
-//           <h1 className="text-2xl font-bold text-neugray-text">Job Seeker Dashboard</h1>
-//           <button 
-//             onClick={handleLogout}
-//             className="bg-neugray-bg px-4 py-2 rounded-lg shadow-neumorph-sm text-neugray-text font-medium hover:shadow-neumorph active:shadow-neumorph-pressed transition-shadow"
-//           >
-//             Logout
-//           </button>
-//         </div>
-
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-//           {/* Profile Card */}
-//           <div className="bg-neugray-bg rounded-2xl shadow-neumorph p-6 col-span-1 md:col-span-2">
-//             <div className="flex items-center mb-4">
-//               <div className="w-16 h-16 rounded-full bg-neugray-accent text-white flex items-center justify-center text-2xl font-bold shadow-neumorph-sm">
-//                 {profile.name.charAt(0)}
-//               </div>
-//               <div className="ml-4">
-//                 <h2 className="text-xl font-bold text-neugray-text">{profile.name}</h2>
-//                 <p className="text-gray-600">{profile.title}</p>
-//                 <p className="text-gray-600">{profile.location}</p>
-//               </div>
-//             </div>
-//             <div className="mt-4">
-//               <h3 className="text-lg font-medium text-neugray-text">Profile Completion</h3>
-//               <div className="mt-2 h-2 bg-gray-200 rounded-full shadow-inner">
-//                 <div 
-//                   className="h-full bg-neugray-accent rounded-full" 
-//                   style={{ width: `${profile.completionRate}%` }}
-//                 ></div>
-//               </div>
-//               <p className="mt-1 text-sm text-gray-600">{profile.completionRate}% Complete</p>
-//             </div>
-//           </div>
-
-//           {/* Skills Card */}
-//           <div className="bg-neugray-bg rounded-2xl shadow-neumorph p-6 col-span-1 md:col-span-2">
-//             <h2 className="text-xl font-bold text-neugray-text mb-4">Skills</h2>
-//             <div className="flex flex-wrap gap-2">
-//               {skills.map((skill, index) => (
-//                 <span 
-//                   key={index} 
-//                   className="px-3 py-1 bg-neugray-bg rounded-full text-sm shadow-neumorph-sm"
-//                 >
-//                   {skill}
-//                 </span>
-//               ))}
-//             </div>
-//           </div>
-
-//           {/* Applied Jobs */}
-//           <div className="bg-neugray-bg rounded-2xl shadow-neumorph p-6 col-span-1 md:col-span-2">
-//             <h2 className="text-xl font-bold text-neugray-text mb-4">Applied Jobs</h2>
-//             <div className="overflow-x-auto">
-//               <table className="w-full">
-//                 <thead>
-//                   <tr className="text-left text-gray-500">
-//                     <th className="pb-3">Position</th>
-//                     <th className="pb-3">Company</th>
-//                     <th className="pb-3">Applied On</th>
-//                     <th className="pb-3">Status</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody className="divide-y divide-gray-200">
-//                   {appliedJobs.map(job => (
-//                     <tr key={job.id} className="hover:bg-gray-50 transition-colors">
-//                       <td className="py-3">{job.title}</td>
-//                       <td className="py-3">{job.company}</td>
-//                       <td className="py-3">{job.appliedDate}</td>
-//                       <td className="py-3">
-//                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-//                           job.status === "Under Review" ? "bg-blue-100 text-blue-700" :
-//                           job.status === "Interview Scheduled" ? "bg-green-100 text-green-700" :
-//                           "bg-red-100 text-red-700"
-//                         }`}>
-//                           {job.status}
-//                         </span>
-//                       </td>
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </table>
-//             </div>
-//           </div>
-
-//           {/* Recommended Jobs */}
-//           <div className="bg-neugray-bg rounded-2xl shadow-neumorph p-6 col-span-1 md:col-span-2">
-//             <h2 className="text-xl font-bold text-neugray-text mb-4">Recommended Jobs</h2>
-//             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-//               {recommendedJobs.map(job => (
-//                 <div key={job.id} className="p-4 bg-neugray-bg rounded-xl shadow-neumorph-sm">
-//                   <h3 className="font-semibold text-neugray-text">{job.title}</h3>
-//                   <h4 className="text-gray-600 mb-2">{job.company}</h4>
-//                   <div className="flex justify-between text-sm text-gray-500 mb-4">
-//                     <span>{job.location}</span>
-//                     <span>{job.salary}</span>
-//                   </div>
-//                   <button className="w-full bg-neugray-bg py-2 rounded-lg shadow-neumorph-sm hover:shadow-neumorph active:shadow-neumorph-pressed transition-shadow text-neugray-accent font-medium">
-//                     Apply Now
-//                   </button>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default JobSeekerDashboard;
-
-
 
 
 import React, { useState } from 'react';
@@ -135,16 +6,18 @@ import { mockData } from '../data/mockdata';
 import flowe from '../assets/flowe.png'
 import { useEffect } from 'react';
 
-import { delay, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 const JobSeekerDashboard = () => {
   const navigate = useNavigate();
   const { profile, appliedJobs, recommendedJobs } = mockData.jobseeker;
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+const {logout} = useAuth()
   const [skills, setSkills] = useState([]);
   const [newSkill, setNewSkill] = useState('');
   const [isEditing, setIsEditing] = useState(false)
 
   const handleLogout = () => {
+    logout();
     navigate('/login');
   };
 
@@ -204,6 +77,7 @@ const JobSeekerDashboard = () => {
     setNewSkill('');
   };
 
+  
  
   const containerVariants = {
     hidden: {},
@@ -225,7 +99,7 @@ const JobSeekerDashboard = () => {
         type: "spring",
         stiffness: 260,
         damping: 20,
-        delay: 0.3 * (Math.random() * 2) // Random delay for each skill
+        delay: 0.3 * (Math.random() * 2) 
       }
     }
   };
