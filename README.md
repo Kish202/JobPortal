@@ -1,5 +1,5 @@
 # 🧑‍💼 Job Portal Dashboard
-https://github.com/Kish202/JobPortal
+https://jobportal-ten-lime.vercel.app/login
 A full-featured Job Portal Dashboard built using **React**, **Vite**, and **Tailwind CSS** with a clean neuomorphic design.  
 This application supports three types of users with role-specific dashboards:
 
